@@ -246,10 +246,13 @@ def get_bgg_ids(skip_recently_modified):
     cursor.execute(query)
     games_to_update = []
     for row in cursor:
-        ALL_BGG_IDS.append(row[0])  # global constant needed for other queries.
-        time_since_last_update = (datetime.now()-(row[1])).total_seconds()
-        if skip_recently_modified and time_since_last_update > TIME_BETWEEN_UPDATES:  # row[] is last modified date
-            games_to_update.append(row[0])
+        if row[0] < 10000000:
+            print(row[0])
+            ALL_BGG_IDS.append(row[0])  # global constant needed for other queries.
+            if row[1]:
+                time_since_last_update = (datetime.now()-(row[1])).total_seconds()
+            if skip_recently_modified and time_since_last_update > TIME_BETWEEN_UPDATES:  # row[] is last modified date
+                games_to_update.append(row[0])
 
     return games_to_update if skip_recently_modified else ALL_BGG_IDS
 
@@ -400,6 +403,6 @@ def test_update():
 if __name__ == '__main__':
     CONNECTION = connect()
     SSL_CONTEXT = get_ssl_context()
-    # update_all_games(skip_recently_modified=True)
-    update_new_games()
+    update_all_games(skip_recently_modified=True)
+    # update_new_games()
     # test_update()
