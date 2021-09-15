@@ -391,17 +391,22 @@ class BgDbUpdaterService:
         query = 'UPDATE configuration SET value = \'true\' WHERE type = \'update_lock\''
         cursor = self.CONNECTION.cursor()
         cursor.execute(query)
+        self.CONNECTION.commit()
+        cursor.close()
 
     def unlock_database(self):
         query = 'UPDATE configuration SET value = \'false\' WHERE type = \'update_lock\''
         cursor = self.CONNECTION.cursor()
         cursor.execute(query)
+        self.CONNECTION.commit()
+        cursor.close()
 
     def get_lock_status(self):
         query = 'SELECT value FROM configuration WHERE type = \'update_lock\''
         cursor = self.CONNECTION.cursor()
         cursor.execute(query)
         lock_status = cursor.fetchone()[0]
+        cursor.close()
         return True if lock_status == 'true' else False
 
     # CORE METHODS
