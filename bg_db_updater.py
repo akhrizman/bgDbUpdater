@@ -12,11 +12,11 @@ TEST_LIST_OF_ONE = [202102]
 TEST_LIST_OF_TWO = [3837, 3837]
 BGG_API_URL = 'https://www.boardgamegeek.com/xmlapi/boardgame/%s'
 BGG_API2_URL = 'https://www.boardgamegeek.com/xmlapi2/thing?id=%s&stats=1'
-SSL_CONTEXT = None
 TIME_DELAY = 2.1
 TIME_BETWEEN_UPDATES = 24*60*60  # 1 day
 ALL_BGG_IDS = []
 DEBUG = False
+SSL_CONTEXT = None
 CONNECTION = None
 NEW_VALUES = {
     "category": set(),
@@ -403,6 +403,6 @@ def test_update():
 if __name__ == '__main__':
     CONNECTION = connect()
     SSL_CONTEXT = get_ssl_context()
-    update_all_games(skip_recently_modified=True)
-    # update_new_games()
+    # update_all_games(skip_recently_modified=True)
+    update_new_games()
     # test_update()
