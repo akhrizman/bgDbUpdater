@@ -41,10 +41,17 @@ def sync_new_games():
     return "Sync Complete"
 
 
-@app.route('/lock')
+@app.route('/lockStatus')
 def check_lock_status():
     bg_updater_service = BgDbUpdaterService()
     bg_updater_service.get_lock_status()
+    return str(bg_updater_service.get_lock_status())
+
+
+@app.route('/unlock')
+def unlock_database():
+    bg_updater_service = BgDbUpdaterService()
+    bg_updater_service.unlock_database()
     return str(bg_updater_service.get_lock_status())
 
 
