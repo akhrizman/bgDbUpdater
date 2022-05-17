@@ -1,4 +1,5 @@
 import mysql.connector
+
 from mysql.connector import Error
 from urllib.request import urlopen
 from xml.etree.ElementTree import parse
@@ -141,7 +142,7 @@ def add_game_data_from_xml(game_data, xml_item):
 class BgDbUpdaterService:
 
     TEST_LIST_OF_ONE = [202102]
-    TEST_LIST_OF_TWO = [3837, 3837]
+    TEST_LIST_OF_TWO = [3837, 202102]
     BGG_API_URL = 'https://www.boardgamegeek.com/xmlapi/boardgame/%s'
     BGG_API2_URL = 'https://www.boardgamegeek.com/xmlapi2/thing?id=%s&stats=1'
     TIME_DELAY = 2.1
@@ -322,7 +323,7 @@ class BgDbUpdaterService:
 
         print("\nAttempting to update %d games" % len(bgg_ids))
         time_estimate = len(bgg_ids)*self.TIME_DELAY
-        self.lock_database()
+        self.set_db_config_to_locked()
         print("This should take approx. %d seconds" % time_estimate)
         print("===========================================================")
 
@@ -385,44 +386,52 @@ class BgDbUpdaterService:
             print("   Failed to update %d games: [%s]" % (len(failures), ", ".join(str(failures))))
         print("===========================================================")
 
-        disconnect(self.CONNECTION)
-
-    def lock_database(self):
-        query = 'UPDATE configuration SET value = \'true\' WHERE type = \'update_lock\''
+    def update_lock_status(self, lock_status):
+        query = "UPDATE configuration SET value = '%s' WHERE type = 'update_lock'" % lock_status
         cursor = self.CONNECTION.cursor()
         cursor.execute(query)
         self.CONNECTION.commit()
         cursor.close()
 
-    def unlock_database(self):
-        query = 'UPDATE configuration SET value = \'false\' WHERE type = \'update_lock\''
-        cursor = self.CONNECTION.cursor()
-        cursor.execute(query)
-        self.CONNECTION.commit()
-        cursor.close()
+    def set_db_config_to_locked(self):
+        print("Locking Database")
+        self.update_lock_status("LOCKED")
+
+    def set_db_config_to_unlocked(self):
+        print("Unlocking Database")
+        self.update_lock_status("UNLOCKED")
 
     def get_lock_status(self):
-        query = 'SELECT value FROM configuration WHERE type = \'update_lock\''
+        query = "SELECT value FROM configuration WHERE type = 'update_lock'"
         cursor = self.CONNECTION.cursor()
         cursor.execute(query)
         lock_status = cursor.fetchone()[0]
         cursor.close()
-        return True if lock_status == 'true' else False
+        return True if str(lock_status).upper() == 'LOCKED' else False
 
-    # CORE METHODS
+    # API METHODS
     def update_all_games(self, skip_recently_modified):
-        print("Locking Database")
-        self.lock_database()
+        self.set_db_config_to_locked()
         self.update_games(self.get_bgg_ids(skip_recently_modified))
-        print("Unlocking Database")
-        self.unlock_database()
+        self.set_db_config_to_unlocked()
+        disconnect(self.CONNECTION)
 
     def update_new_games(self):
-        print("Locking Database")
-        self.lock_database()
+        self.set_db_config_to_locked()
         self.update_games(self.get_bgg_ids_for_new_games())
-        print("Unlocking Database")
-        self.unlock_database()
+        self.set_db_config_to_unlocked()
+        disconnect(self.CONNECTION)
 
     def test_update(self):
+        self.set_db_config_to_locked()
         self.update_games(self.TEST_LIST_OF_TWO)
+        self.set_db_config_to_unlocked()
+        disconnect(self.CONNECTION)
+
+    def lock_database(self):
+        self.set_db_config_to_locked()
+        disconnect(self.CONNECTION)
+
+    def unlock_database(self):
+        self.set_db_config_to_unlocked()
+        disconnect(self.CONNECTION)
