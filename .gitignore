@@ -1,4 +1,3 @@
 /configurations.py
-/venv/lib/
-/venv/lib64/
-/idea/misc.xml
+/idea/*
+/venv/*

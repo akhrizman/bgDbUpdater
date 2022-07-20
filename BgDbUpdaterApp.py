@@ -28,6 +28,18 @@ def sync_all_games(update_recent):
     return "Sync Complete"
 
 
+@app.route('/testSync')
+def test_sync_one_game():
+    bg_updater_service = BgDbUpdaterService()
+    locked = bg_updater_service.get_lock_status()
+
+    if locked:
+        return 'Database is Locked. Try again later'
+    else:
+        bg_updater_service.test_update()
+    return "Test Sync Complete"
+
+
 @app.route('/syncNew')
 def sync_new_games():
     # Syncing Newly Added Games
@@ -44,15 +56,22 @@ def sync_new_games():
 @app.route('/lockStatus')
 def check_lock_status():
     bg_updater_service = BgDbUpdaterService()
-    bg_updater_service.get_lock_status()
-    return str(bg_updater_service.get_lock_status())
+    locked = bg_updater_service.get_lock_status()
+    return "LOCKED" if locked else "UNLOCKED"
 
 
 @app.route('/unlock')
 def unlock_database():
     bg_updater_service = BgDbUpdaterService()
     bg_updater_service.unlock_database()
-    return str(bg_updater_service.get_lock_status())
+    return "UNLOCKED"
+
+
+@app.route('/lock')
+def lock_database():
+    bg_updater_service = BgDbUpdaterService()
+    bg_updater_service.lock_database()
+    return "LOCKED"
 
 
 if __name__ == '__main__':
