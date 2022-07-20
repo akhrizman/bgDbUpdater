@@ -71,21 +71,21 @@ def sync_new_games():
     return 'Sync Complete'
 
 
-@app.route('/lockStatus')
+@app.route('/lockStatus', methods=['GET'])
 def check_lock_status():
     bg_updater_service = BgDbUpdaterService()
     locked = bg_updater_service.get_lock_status()
     return 'LOCKED' if locked else 'UNLOCKED'
 
 
-@app.route('/unlock')
+@app.route('/unlock', methods=['POST'])
 def unlock_database():
     bg_updater_service = BgDbUpdaterService()
     bg_updater_service.unlock_database()
     return 'UNLOCKED'
 
 
-@app.route('/lock')
+@app.route('/lock', methods=['POST'])
 def lock_database():
     bg_updater_service = BgDbUpdaterService()
     bg_updater_service.lock_database()
