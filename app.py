@@ -11,6 +11,7 @@ def hello():
 
 @app.route('/get', methods=['GET'])
 def test_get():
+    bg_updater_service = BgDbUpdaterService()
     if request.method == 'GET':
         data = {
             "testGet": "Get Works",
