@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from BgDbUpdaterService import BgDbUpdaterService
+import os
 
 app = Flask(__name__)   # Flask constructor
 
@@ -38,7 +39,7 @@ def sync_all_games(update_recent):
 
     if update_recent == 'force':
         # Syncing All
-        bg_updater_service.update_all_games()
+        bg_updater_service.update_all_games(skip_recently_modified=False)
     else:
         # Syncing All Except Recently Synced
         bg_updater_service.update_all_games(skip_recently_modified=True)
@@ -93,5 +94,6 @@ def lock_database():
     return 'LOCKED'
 
 
-if __name__ == '__main__':
-    app.run(debug=True, port=8082)
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 8085))
+    app.run(debug=True, host='0.0.0.0', port=port)
