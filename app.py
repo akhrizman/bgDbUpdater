@@ -11,7 +11,6 @@ def hello():
 
 @app.route('/get', methods=['GET'])
 def test_get():
-    bg_updater_service = BgDbUpdaterService()
     if request.method == 'GET':
         data = {
             "testGet": "Get Works",
@@ -28,8 +27,8 @@ def test_post():
         return jsonify(data)
 
 
-@app.route('/syncAll/', defaults={'update_recent': 'skip'})
-@app.route('/syncAll/<update_recent>')
+@app.route('/syncAll/', defaults={'update_recent': 'skip'}, methods=['GET'])
+@app.route('/syncAll/<update_recent>', methods=['GET'])
 def sync_all_games(update_recent):
     bg_updater_service = BgDbUpdaterService()
     locked = bg_updater_service.get_lock_status()
@@ -47,7 +46,7 @@ def sync_all_games(update_recent):
     return 'Sync Complete'
 
 
-@app.route('/testSync')
+@app.route('/testSync', methods=['GET'])
 def test_sync_one_game():
     bg_updater_service = BgDbUpdaterService()
     locked = bg_updater_service.get_lock_status()
@@ -59,8 +58,9 @@ def test_sync_one_game():
     return 'Test Sync Complete'
 
 
-@app.route('/syncNew')
+@app.route('/syncNew', methods=['GET'])
 def sync_new_games():
+    print('Attempting to Update New Games')
     # Syncing Newly Added Games
     bg_updater_service = BgDbUpdaterService()
     locked = bg_updater_service.get_lock_status()
@@ -94,4 +94,4 @@ def lock_database():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8082)
