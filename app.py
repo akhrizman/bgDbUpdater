@@ -10,7 +10,7 @@ def hello():
     return 'BG Database Updater'
 
 
-@app.route('/syncAll', methods=['GET'])
+@app.route('/syncAll', methods=['POST'])
 def sync_all_games():
     print('Attempting to Update All Games')
     bg_updater_service = BgDbUpdaterService()
@@ -23,7 +23,7 @@ def sync_all_games():
     return app.response_class(json.dumps('Sync Complete'), content_type='application/json')
 
 
-@app.route('/syncAllIncludingRecent', methods=['GET'])
+@app.route('/syncAllIncludingRecent', methods=['POST'])
 def sync_all_games_including_recent():
     print('Attempting to Update All Games including recently updated')
     bg_updater_service = BgDbUpdaterService()
@@ -36,7 +36,7 @@ def sync_all_games_including_recent():
     return app.response_class(json.dumps('Sync Complete'), content_type='application/json')
 
 
-@app.route('/syncNew', methods=['GET'])
+@app.route('/syncNew', methods=['POST'])
 def sync_new_games():
     print('Attempting to Update New Games')
     # Syncing Newly Added Games
