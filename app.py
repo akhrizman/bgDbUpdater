@@ -109,11 +109,4 @@ def lock_database():
 
 
 if __name__ == "__main__":
-    host = "0.0.0.0"
-    port = 5000
-    debug = app.config['DEBUG']
-    if _deployed_env_ == 'production':
-        from waitress import serve
-        serve(app, host=host, port=port)
-    else:
-        app.run(debug=debug, host=host, port=port)
+    app.run(debug=app.config['DEBUG'], host="0.0.0.0", port=5000)
