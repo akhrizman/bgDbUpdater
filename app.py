@@ -15,9 +15,9 @@ app.config.from_object('settings')
 if _deployed_env_ is not None:
     if _deployed_env_ == 'local':
         app.config.from_pyfile('./appconfigs/dev_settings.py')
-    elif _deployed_env_ == 'dev':
+    elif _deployed_env_ == 'development':
         app.config.from_pyfile('./appconfigs/dev_settings.py')
-    elif _deployed_env_ == 'prod':
+    elif _deployed_env_ == 'production':
         app.config.from_pyfile('./appconfigs/prod_settings.py')
     else:
         raise RuntimeError('Unknown environment setting provided.')
