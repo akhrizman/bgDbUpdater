@@ -6,7 +6,7 @@ from xml.etree.ElementTree import parse
 import ssl
 import time
 from datetime import datetime
-from configurations import CONFIG
+from flask import current_app
 
 
 def get_game_data_key_from_data_type(i):
@@ -84,7 +84,7 @@ def connect():
     """ Connect to MySQL database """
     connection = None
     try:
-        connection = mysql.connector.connect(**CONFIG)
+        connection = mysql.connector.connect(**current_app.config['DATASOURCE'])
         if connection.is_connected():
             print('Connected to boardgamedb')
         connection.raise_on_warnings = False

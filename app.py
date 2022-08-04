@@ -2,12 +2,31 @@ from flask import Flask, jsonify, request, json
 from BgDbUpdaterService import BgDbUpdaterService
 import os
 
+_deployed_env_ = os.environ.get("FLASK_ENV", default=None)
+
+# Flask app init
 app = Flask(__name__)   # Flask constructor
+
+# read from initial config in settings.py
+app.config.from_object('settings')
+
+
+# override env variables based on deploy target
+if _deployed_env_ is not None:
+    if _deployed_env_ == 'local':
+        app.config.from_pyfile('./appconfigs/dev_settings.py')
+    elif _deployed_env_ == 'dev':
+        app.config.from_pyfile('./appconfigs/dev_settings.py')
+    elif _deployed_env_ == 'prod':
+        app.config.from_pyfile('./appconfigs/prod_settings.py')
+    else:
+        raise RuntimeError('Unknown environment setting provided.')
 
 
 @app.route('/')
 def hello():
-    return 'BG Database Updater'
+    return {'environment': _deployed_env_,
+            'database': app.config['DATASOURCE']['database']}
 
 
 @app.route('/syncAll', methods=['POST'])
