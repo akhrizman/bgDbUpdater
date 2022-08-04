@@ -102,6 +102,18 @@ def lock_database():
     return app.response_class(json.dumps("LOCKED"), content_type='application/json')
 
 
+# if __name__ == "__main__":
+#     port = int(os.environ.get('PORT', 8085))
+#     app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=port)
+#     # app.run()
+
+
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 8085))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    host = "0.0.0.0"
+    port = 5000
+    debug = app.config['DEBUG']
+    if _deployed_env_ == 'production':
+        from waitress import serve
+        serve(app, host=host, port=port)
+    else:
+        app.run(debug=debug, host=host, port=port)
