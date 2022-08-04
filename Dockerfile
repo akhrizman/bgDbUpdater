@@ -2,6 +2,8 @@
 
 FROM python:3.8-slim-buster
 
+ENV FLASK_ENV=production
+
 WORKDIR /bg-db-updater
 
 COPY requirements.txt requirements.txt
