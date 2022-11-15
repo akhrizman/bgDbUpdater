@@ -43,7 +43,7 @@ def get_polled_min_age(age_poll):
     return polled_min_age
 
 
-def get_query_for_game_update(bgg_id, sql_insert_values):
+def get_query_for_game_update(bgg_id, sql_insert_values, name_locked):
     """ Query Builder for game values """
 
     query_update = "UPDATE game SET"
@@ -54,7 +54,10 @@ def get_query_for_game_update(bgg_id, sql_insert_values):
             column_value_pairs.append("%s = %.1f" % (column, sql_insert_values[column]))
         elif isinstance(sql_insert_values[column], int):
             column_value_pairs.append("%s = %d" % (column, sql_insert_values[column]))
-        elif isinstance(sql_insert_values[column], str) or isinstance(sql_insert_values[column], datetime):
+        elif isinstance(sql_insert_values[column], str):
+            if not name_locked and column != "name":
+                column_value_pairs.append("%s = '%s'" % (column, sql_insert_values[column]))
+        elif isinstance(sql_insert_values[column], datetime):
             column_value_pairs.append("%s = '%s'" % (column, sql_insert_values[column]))
 
     query_values = ", ".join(column_value_pairs)
@@ -334,6 +337,8 @@ class BgDbUpdaterService:
             game_data = self.get_data_for_sql(bgg_id)
             time.sleep(self.TIME_DELAY)
 
+            name_locked = self.check_name_locked(bgg_id)
+
             category_query, new_game_category_query, game_category_query = \
                 self.get_queries_for_addition_data_type_update('category', bgg_id, game_data, existing_category_id_map)
             mechanic_query, new_game_mechanic_query, game_mechanic_query = \
@@ -344,7 +349,7 @@ class BgDbUpdaterService:
                 if not self.DEBUG:
                     cursor = self.CONNECTION.cursor()
 
-                    cursor.execute(get_query_for_game_update(bgg_id, game_data))
+                    cursor.execute(get_query_for_game_update(bgg_id, game_data, name_locked))
                     cursor.execute(get_query_for_game_expansion_update(bgg_id, game_data))
 
                     cursor.execute(category_query)
@@ -435,3 +440,23 @@ class BgDbUpdaterService:
     def unlock_database(self):
         self.set_db_config_to_unlocked()
         disconnect(self.CONNECTION)
+
+    def check_name_locked(self, bgg_id):
+        query = "SELECT lock_title FROM game WHERE bgg_id = " + str(bgg_id)
+        cursor = self.CONNECTION.cursor()
+        cursor.execute(query)
+        name_locked = bool(cursor.fetchone()[0])
+        return name_locked
+
+    # def do_something(self):
+    #     query = "SELECT lock_title FROM game WHERE bgg_id = " + str(5)
+    #     cursor = self.CONNECTION.cursor()
+    #     cursor.execute(query)
+    #     name_locked = bool(cursor.fetchone()[0])
+    #     print(name_locked)
+    #     print(type(name_locked))
+    #     cursor.close()
+    #     if name_locked:
+    #         return "The Name is Locked"
+    #     else:
+    #         return "The Name is NOT Locked"
