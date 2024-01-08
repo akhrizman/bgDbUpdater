@@ -14,7 +14,7 @@ app.config.from_object('settings')
 # override env variables based on deploy target
 if _deployed_env_ is not None:
     if _deployed_env_ == 'local':
-        app.config.from_pyfile('./appconfigs/dev_settings.py')
+        app.config.from_pyfile('./appconfigs/local_settings.py')
     elif _deployed_env_ == 'development':
         app.config.from_pyfile('./appconfigs/dev_settings.py')
     elif _deployed_env_ == 'production':
