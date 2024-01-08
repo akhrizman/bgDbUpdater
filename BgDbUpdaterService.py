@@ -51,7 +51,10 @@ def get_query_for_game_update(bgg_id, sql_insert_values, name_locked):
     column_value_pairs = []
     for column in sql_insert_values:
         if isinstance(sql_insert_values[column], float):
-            column_value_pairs.append("%s = %.1f" % (column, sql_insert_values[column]))
+            if column == "weight":
+                column_value_pairs.append("%s = %.2f" % (column, round(sql_insert_values[column], 2)) )
+            else:
+                column_value_pairs.append("%s = %.1f" % (column, round(sql_insert_values[column], 2)) )
         elif isinstance(sql_insert_values[column], int):
             column_value_pairs.append("%s = %d" % (column, sql_insert_values[column]))
         elif isinstance(sql_insert_values[column], str):
@@ -131,6 +134,7 @@ def add_game_data_from_xml(game_data, xml_item):
         'image_url': xml_item.findtext('thumbnail'),
         'bgg_rating': float((xml_item.find('./statistics/ratings/bayesaverage').attrib['value'])),
         'user_rating': float((xml_item.find('./statistics/ratings/average').attrib['value'])),
+        'weight': float((xml_item.find('./statistics/ratings/averageweight').attrib['value'])),
         'last_bgg_check': datetime.now()
     })
 
@@ -144,9 +148,7 @@ def add_game_data_from_xml(game_data, xml_item):
 
 class BgDbUpdaterService:
 
-    TEST_LIST_OF_ONE = [202102]
-    TEST_LIST_OF_TWO = [3837, 202102]
-    BGG_API_URL = 'https://www.boardgamegeek.com/xmlapi/boardgame/%s'
+    TEST_LIST_OF_TWO = [13, 3, 314543]
     BGG_API2_URL = 'https://www.boardgamegeek.com/xmlapi2/thing?id=%s&stats=1'
     TIME_DELAY = 2.1
     TIME_BETWEEN_UPDATES = 24 * 60 * 60  # 1 day
@@ -185,6 +187,10 @@ class BgDbUpdaterService:
         """ Process xml from Boardgame Geek API into data map """
 
         xml_doc = self.get_raw_xml_from_bgg_api(bgg_id)
+
+        if not xml_doc.find('./item'):
+            print("bgg_id not found on BoardGameGeek.")
+            return None
 
         game_type = xml_doc.find('./item').attrib['type']
         game_data = {'stage': 'expansion' if game_type == 'boardgameexpansion' else 'base'}
@@ -335,6 +341,8 @@ class BgDbUpdaterService:
             count += 1
             print("Attempting to update bgg_id %s...(%d/%d)....." % (bgg_id, count, len(bgg_ids)), end="")
             game_data = self.get_data_for_sql(bgg_id)
+            if not game_data:
+                continue
             time.sleep(self.TIME_DELAY)
 
             name_locked = self.check_name_locked(bgg_id)
@@ -386,7 +394,7 @@ class BgDbUpdaterService:
 
         print("===========================================================")
         if len(successful_game_updates) > 0:
-            print("   Successfully updated %d games" % len(successful_game_updates))
+            print("   Successfully updated %d games of %d attempted" % (len(successful_game_updates), len(bgg_ids)))
         if len(failures) > 0:
             print("   Failed to update %d games: [%s]" % (len(failures), ", ".join(str(failures))))
         print("===========================================================")
