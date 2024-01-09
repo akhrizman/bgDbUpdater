@@ -14,9 +14,9 @@ docker image build -t updater .
 
 # Deploy dev - MUST BE in root directory of project
 docker stop {current dev container}
-docker run -dp 9085:5000 --name updater-dev -e FLASK_ENV=development updater
+docker run -dp 9085:5000 --name updater_dev -e FLASK_ENV=development updater
 
 # Deploy both
 docker stop {current prod container}
-docker run -dp 8085:5000 --name updater-prod -e FLASK_ENV=production updater
+docker run -dp 8085:5000 --name updater_prod -e FLASK_ENV=production updater
 ```
