@@ -9,14 +9,14 @@
 
 ## Deployment
 ```bash
-# Build the project
-docker image build -t updater .
+# Build the project from master (or other branch)
+docker image build -t updater_master .
 
 # Deploy dev - MUST BE in root directory of project
 docker stop {current dev container}
-docker run -dp 9085:5000 --name updater_dev -e FLASK_ENV=development updater
+docker run -dp 9085:5000 --name updater_dev -e FLASK_ENV=development updater_master
 
-# Deploy both
+# Deploy prod - MUST BE in root directory of project
 docker stop {current prod container}
-docker run -dp 8085:5000 --name updater_prod -e FLASK_ENV=production updater
+docker run -dp 8085:5000 --name updater_prod -e FLASK_ENV=production updater_master
 ```
