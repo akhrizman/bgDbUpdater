@@ -148,8 +148,8 @@ def add_game_data_from_xml(game_data, xml_item):
 
 class BgDbUpdaterService:
 
-    TEST_LIST_OF_TWO = [13, 3, 314543]
-    BGG_API2_URL = 'https://www.boardgamegeek.com/xmlapi2/thing?id=%s&stats=1'
+    TEST_LIST_OF_TWO = [420120]
+    BGG_API2_URL = 'https://boardgamegeek.com/xmlapi2/thing?id=%s&stats=1'
     TIME_DELAY = 2.1
     TIME_BETWEEN_UPDATES = 24 * 60 * 60  # 1 day
     ALL_BGG_IDS = []
