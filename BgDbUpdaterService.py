@@ -169,17 +169,14 @@ class BgDbUpdaterService:
         self.CONNECTION = connect()
         self.SSL_CONTEXT = get_ssl_context()
         self.AUTH_STRING = config['BEARER_TOKEN_STRING']
-        print('AUTH_STRING set: %s' % self.AUTH_STRING)
 
     # BGG API DATA REQUESTS & PROCESSING
     def get_raw_xml_from_bgg_api(self, bgg_id):
-        print('\nget_raw_xml_from_bgg_api: %s' % self.AUTH_STRING)
         headers = {'Authorization': self.AUTH_STRING}
         req = Request(self.BGG_API2_URL % bgg_id, headers=headers)
         with urlopen(req,  context=self.SSL_CONTEXT) as response:
-            rawXML = parse(response)
-            print('Game Type: %s' % rawXML.find('./item').attrib['type'])
-            return rawXML
+            raw_xml = parse(response)
+            return raw_xml
 
     def add_game_expansions(self, game_data, xml_item):
         """ Add expansions to game data """
