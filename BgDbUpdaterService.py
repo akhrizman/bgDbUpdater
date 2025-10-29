@@ -2,6 +2,7 @@ import mysql.connector
 
 from mysql.connector import Error
 from urllib.request import urlopen
+from urllib.request import Request
 from xml.etree.ElementTree import parse
 import ssl
 import time
@@ -163,14 +164,17 @@ class BgDbUpdaterService:
         "designer": set(),
     }
 
-    def __init__(self):
+    def __init__(self, config):
         self.CONNECTION = connect()
         self.SSL_CONTEXT = get_ssl_context()
+        self.auth_string = config['BEARER_TOKEN_STRING']
 
     # BGG API DATA REQUESTS & PROCESSING
     def get_raw_xml_from_bgg_api(self, bgg_id):
-        response = urlopen(self.BGG_API2_URL % bgg_id, context=self.SSL_CONTEXT)
-        return parse(response)
+        headers = {'Authorization': self.auth_string}
+        req = Request(self.BGG_API2_URL % bgg_id, headers=headers)
+        with urlopen(req,  context=self.SSL_CONTEXT) as response:
+            return parse(response)
 
     def add_game_expansions(self, game_data, xml_item):
         """ Add expansions to game data """

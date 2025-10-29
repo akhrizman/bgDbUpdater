@@ -45,7 +45,7 @@ def sync_all_games():
 @app.route('/syncAllIncludingRecent', methods=['POST'])
 def sync_all_games_including_recent():
     print('Attempting to Update All Games including recently updated')
-    bg_updater_service = BgDbUpdaterService()
+    bg_updater_service = BgDbUpdaterService(app.config)
     locked = bg_updater_service.get_lock_status()
 
     if locked:
@@ -59,7 +59,7 @@ def sync_all_games_including_recent():
 def sync_new_games():
     print('Attempting to Update New Games')
     # Syncing Newly Added Games
-    bg_updater_service = BgDbUpdaterService()
+    bg_updater_service = BgDbUpdaterService(app.config)
     locked = bg_updater_service.get_lock_status()
 
     if locked:
@@ -71,7 +71,7 @@ def sync_new_games():
 
 @app.route('/testSync', methods=['GET'])
 def test_sync_one_game():
-    bg_updater_service = BgDbUpdaterService()
+    bg_updater_service = BgDbUpdaterService(app.config)
     locked = bg_updater_service.get_lock_status()
 
     if locked:
@@ -83,27 +83,27 @@ def test_sync_one_game():
 
 @app.route('/lockStatus', methods=['GET'])
 def check_lock_status():
-    bg_updater_service = BgDbUpdaterService()
+    bg_updater_service = BgDbUpdaterService(app.config)
     is_locked = bg_updater_service.get_lock_status()
     return app.response_class(json.dumps(is_locked), content_type='application/json')
 
 
 @app.route('/unlock', methods=['POST'])
 def unlock_database():
-    bg_updater_service = BgDbUpdaterService()
+    bg_updater_service = BgDbUpdaterService(app.config)
     bg_updater_service.unlock_database()
     return app.response_class(json.dumps("UNLOCKED"), content_type='application/json')
 
 
 @app.route('/lock', methods=['POST'])
 def lock_database():
-    bg_updater_service = BgDbUpdaterService()
+    bg_updater_service = BgDbUpdaterService(app.config)
     bg_updater_service.lock_database()
     return app.response_class(json.dumps("LOCKED"), content_type='application/json')
 
 # @app.route('/dosomething', methods=['GET'])
 # def do_something():
-#     bg_updater_service = BgDbUpdaterService()
+#     bg_updater_service = BgDbUpdaterService(app.config)
 #     return app.response_class(bg_updater_service.do_something())
 
 # if __name__ == "__main__":
