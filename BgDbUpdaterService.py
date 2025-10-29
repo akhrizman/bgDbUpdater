@@ -157,6 +157,7 @@ class BgDbUpdaterService:
     DEBUG = False
     SSL_CONTEXT = None
     CONNECTION = None
+    AUTH_STRING = None
 
     NEW_VALUES = {
         "category": set(),
@@ -167,14 +168,18 @@ class BgDbUpdaterService:
     def __init__(self, config):
         self.CONNECTION = connect()
         self.SSL_CONTEXT = get_ssl_context()
-        self.auth_string = config['BEARER_TOKEN_STRING']
+        self.AUTH_STRING = config['BEARER_TOKEN_STRING']
+        print('AUTH_STRING set: %s' % self.AUTH_STRING)
 
     # BGG API DATA REQUESTS & PROCESSING
     def get_raw_xml_from_bgg_api(self, bgg_id):
-        headers = {'Authorization': self.auth_string}
+        print('\nget_raw_xml_from_bgg_api: %s' % self.AUTH_STRING)
+        headers = {'Authorization': self.AUTH_STRING}
         req = Request(self.BGG_API2_URL % bgg_id, headers=headers)
         with urlopen(req,  context=self.SSL_CONTEXT) as response:
-            return parse(response)
+            rawXML = parse(response)
+            print('Game Type: %s' % rawXML.find('./item').attrib['type'])
+            return rawXML
 
     def add_game_expansions(self, game_data, xml_item):
         """ Add expansions to game data """
@@ -459,16 +464,3 @@ class BgDbUpdaterService:
         cursor.execute(query)
         name_locked = bool(cursor.fetchone()[0])
         return name_locked
-
-    # def do_something(self):
-    #     query = "SELECT lock_title FROM game WHERE bgg_id = " + str(5)
-    #     cursor = self.CONNECTION.cursor()
-    #     cursor.execute(query)
-    #     name_locked = bool(cursor.fetchone()[0])
-    #     print(name_locked)
-    #     print(type(name_locked))
-    #     cursor.close()
-    #     if name_locked:
-    #         return "The Name is Locked"
-    #     else:
-    #         return "The Name is NOT Locked"

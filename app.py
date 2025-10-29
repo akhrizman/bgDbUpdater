@@ -101,11 +101,6 @@ def lock_database():
     bg_updater_service.lock_database()
     return app.response_class(json.dumps("LOCKED"), content_type='application/json')
 
-# @app.route('/dosomething', methods=['GET'])
-# def do_something():
-#     bg_updater_service = BgDbUpdaterService(app.config)
-#     return app.response_class(bg_updater_service.do_something())
-
 # if __name__ == "__main__":
 #     port = int(os.environ.get('PORT', 8085))
 #     app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=port)
